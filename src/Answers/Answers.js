@@ -1,10 +1,8 @@
 import React from 'react';
 import "./Answer.scss";
 
-const Answers = ({ options , checkCorrectAnswer }) => {
-
+const Answers = ({ options , getUserAnswer}) => {
     return (
-            <ul className="options">
                 <li className="option">
                     <input 
                         type="radio"
@@ -12,14 +10,13 @@ const Answers = ({ options , checkCorrectAnswer }) => {
                         name="answer"
                         id={options}
                         value={options}
-                        onChange={(e) => checkCorrectAnswer(e.target.value)}
+                        onChange={(e) => getUserAnswer(e.target.value, e.target.checked)}
                         />
                         <label className="radioCustomLabel" htmlFor={options}>
                             {options}
                         </label>
                 </li>
-            </ul>
-    )
+    );
 }
 
 

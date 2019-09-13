@@ -7,75 +7,122 @@ import Answers from './Answers/Answers';
 
 function App() {
   const [ state, setState ] = useState({
-      isCorrect: false,
+      correctCount: 0,
+      count: 0,
       activeQuestion: "",
       activeOptions: [],
-      answer: "",
-      checked: false
+      userAnswer: "",
+      checked: false,
+      completed: false,
+      correctAnswer: "",
+      questionIndex: 0,
+      isLoading: false,
+      isShaking: false,
+      passMark: "50%"
   });
 
   useEffect(() => {
-    setState({
+    setState((curState) => ({
+      ...curState,
       activeQuestion: QuestionsService[0].question,
-      activeOptions: QuestionsService[0].options
-    })
+      activeOptions: QuestionsService[0].options,
+    }))
   }, []);
 
-  const checkCorrectAnswer = (value) => {
-    const question = QuestionsService.find(q => q.question === state.activeQuestion);
-    if(value === question.answer){
-      setState({
-        ...state,
-        isCorrect: true,
-        checked: true
-      })
+  const nextQuestion = () => {
+    const curQuestion = QuestionsService.findIndex(q => q.question === state.activeQuestion);
+    if(state.checked){
+      if(curQuestion + 1  !== QuestionsService.length ){
+        setState((curState) => ({
+          ...curState,
+          activeQuestion: QuestionsService[curQuestion + 1].question,
+          activeOptions: QuestionsService[curQuestion + 1].options,
+          correctAnswer: QuestionsService[curQuestion].answer,
+          count: curState.count + 1,
+          checked: false,
+          isShaking: false,
+          correctCount: curState.userAnswer === curState.correctAnswer ? curState.correctCount + 1 : curState.correctCount,
+        }))
+      }
+      
+      if(curQuestion === QuestionsService.length - 1)
+        setState((curState) => ({
+          ...curState,
+          count: curState.count + 1,
+          correctCount: curState.userAnswer === curState.correctAnswer ? curState.correctCount + 1 : curState.correctCount,
+          completed: true,
+          correctAnswer: QuestionsService[curQuestion].answer,
+        }))
+      
     }else{
-      setState({
-        ...state,
-        isCorrect: false,
-        checked: true
-      })
+        setState((curState) => ({
+          ...curState,
+          isShaking: !curState.checked
+        }))
     }
   }
 
-  const nextQuestion = () => {
-    if(state.checked){
-      const curQuestion = QuestionsService.findIndex(q => q.question === state.activeQuestion);
-      setState({
-        ...state,
-        activeQuestion: QuestionsService[curQuestion + 1].question,
-        activeOptions: QuestionsService[curQuestion + 1].options,
-        answer: "",
-        checked: false
-      })
-    }
+  const getUserAnswer = (value, checkBool ) => {
+    const curQuestion = QuestionsService.findIndex(q => q.question === state.activeQuestion);
+    setState((curState) => ({
+      ...curState,
+      userAnswer: value,
+      correctAnswer: QuestionsService[curQuestion].answer,
+      checked: checkBool, 
+      isShaking: false,
+      questionIndex: curQuestion + 1
+    })); 
   }
 
   const prevQuestion = () => {
       const curQuestion = QuestionsService.findIndex(q => q.question === state.activeQuestion);
+      if(curQuestion <= 0){
+        setState((curState) => ({
+          ...curState,
+          activeQuestion: QuestionsService[curQuestion].question,
+          activeOptions: QuestionsService[curQuestion].options,
+        }))
+        return;
+      }
       setState({
         ...state,
         activeQuestion: QuestionsService[curQuestion - 1].question,
         activeOptions: QuestionsService[curQuestion - 1].options,
-        answer: "",
-        checked: false
+        correctAnswer: QuestionsService[curQuestion - 1].answer,
       })
-  }
+  };
+
+  console.log(state)
 
   return (
-    <div className="Quiz">
+    <div className="Quiz-container">
+      <h3 className="title">Quiz world</h3>
+      {state.isShaking && <p className="alert">Kindly select an answer</p>}
+    <div className={`Quiz ${state.isShaking && " shake"}` }>
+      {state.completed ?  `You score is ${state.correctCount}/${QuestionsService.length}` : (
+        <>
           <QuestionCount />
-          <Questions question={state.activeQuestion} />
-            {state.activeOptions.map(ans => 
-              <Answers 
-                options={ans} 
-                checkCorrectAnswer={checkCorrectAnswer} 
-                checked={state.checked}  />
-            )}
+          {state.isLoading ? "loading..." : 
+          <>
+            <Questions question={state.activeQuestion} />
+              {state.activeOptions.map(ans => 
+                <ul key={ans}>
+                  <Answers
+                    options={ans} 
+                    getUserAnswer={getUserAnswer}
+                    />
+                </ul>
+              )}
+          </>
+          }
             <div className="btn-container">
-              <div className="btn-next" onClick={prevQuestion}>Previous</div>
+              {/* <div className="btn-next" onClick={prevQuestion}>Previous</div> */}
               <div className="btn-next" onClick={nextQuestion}>Next</div>
             </div>
+        </>
+      )}
+          
+    </div>
     </div>
   );
 }
