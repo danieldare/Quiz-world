@@ -1,0 +1,87 @@
+.LastPage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  top: 30px;
+  overflow: auto;
+
+  .won-img {
+    width: 220px;
+    min-height: 200px;
+    z-index: 1;
+  }
+
+  .score-text {
+    font-size: 1.3rem;
+    font-weight: 500;
+
+    align-self: center;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .text {
+    // background: rgba(87, 87, 87, 0.39);
+    padding: 10px;
+    font-size: 1.2rem;
+    // letter-spacing: -0.1rem;
+  }
+
+  .score {
+    font-size: 4rem;
+    font-weight: 700;
+    z-index: 1;
+    color: rgb(87, 87, 87);
+  }
+
+  .congrats {
+    position: absolute;
+    z-index: 0;
+    opacity: 0.2;
+    height: 450px;
+  }
+
+  .Loser {
+    display: flex;
+    height: 100%;
+    padding: 10px;
+
+    .try-again {
+      background: rgb(165, 49, 49);
+      padding: 10px 15px;
+      font-size: 15px;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+    }
+
+    .angry {
+      width: 110px;
+      min-height: 110px;
+    }
+
+    .loser-text {
+      text-align: center;
+      width: 220px;
+      min-height: 200px;
+    }
+
+    .text {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .score {
+      color: #c52015;
+    }
+
+    .loser-score {
+      text-align: center;
+      align-self: center;
+    }
+  }
+}

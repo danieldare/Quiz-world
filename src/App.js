@@ -4,6 +4,7 @@ import Questions from './Questions/Questions';
 import './App.scss';
 import QuestionCount from './QuestionCount/QuestionCount';
 import Answers from './Answers/Answers';
+import LastPage from './LastPage/LastPage';
 
 function App() {
   const [ state, setState ] = useState({
@@ -18,7 +19,7 @@ function App() {
       questionIndex: 0,
       isLoading: false,
       isShaking: false,
-      passMark: "50%"
+      passMark: 50
   });
 
   useEffect(() => {
@@ -28,6 +29,23 @@ function App() {
       activeOptions: QuestionsService[0].options,
     }))
   }, []);
+
+  const resetGame = () => {
+    setState((curState) => ({
+      ...curState,
+      activeQuestion: QuestionsService[0].question,
+      activeOptions: QuestionsService[0].options,
+      correctCount: 0,
+      count: 0,
+      userAnswer: "",
+      checked: false,
+      completed: false,
+      correctAnswer: "",
+      isLoading: false,
+      isShaking: false,
+      passMark: 50
+    }))
+  }
 
   const nextQuestion = () => {
     const curQuestion = QuestionsService.findIndex(q => q.question === state.activeQuestion);
@@ -73,25 +91,7 @@ function App() {
       questionIndex: curQuestion + 1
     })); 
   }
-
-  const prevQuestion = () => {
-      const curQuestion = QuestionsService.findIndex(q => q.question === state.activeQuestion);
-      if(curQuestion <= 0){
-        setState((curState) => ({
-          ...curState,
-          activeQuestion: QuestionsService[curQuestion].question,
-          activeOptions: QuestionsService[curQuestion].options,
-        }))
-        return;
-      }
-      setState({
-        ...state,
-        activeQuestion: QuestionsService[curQuestion - 1].question,
-        activeOptions: QuestionsService[curQuestion - 1].options,
-        correctAnswer: QuestionsService[curQuestion - 1].answer,
-      })
-  };
-
+   
   console.log(state)
 
   return (
@@ -99,9 +99,17 @@ function App() {
       <h3 className="title">Quiz world</h3>
       {state.isShaking && <p className="alert">Kindly select an answer</p>}
     <div className={`Quiz ${state.isShaking && " shake"}` }>
-      {state.completed ?  `You score is ${state.correctCount}/${QuestionsService.length}` : (
+      {state.completed ?  
+        <LastPage 
+          questionLength={QuestionsService.length} 
+          correctCount={state.correctCount} 
+          pastMark={state.passMark}
+          resetGame={resetGame}
+          /> 
+          : 
+          (
         <>
-          <QuestionCount />
+          <QuestionCount counter={state.count + 1} total={QuestionsService.length} />
           {state.isLoading ? "loading..." : 
           <>
             <Questions question={state.activeQuestion} />
@@ -116,7 +124,6 @@ function App() {
           </>
           }
             <div className="btn-container">
-              {/* <div className="btn-next" onClick={prevQuestion}>Previous</div> */}
               <div className="btn-next" onClick={nextQuestion}>Next</div>
             </div>
         </>
